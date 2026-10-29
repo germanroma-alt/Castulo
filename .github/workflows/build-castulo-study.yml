@@ -1,0 +1,46 @@
+name: Build illustrated Castulo study
+
+on:
+  push:
+    branches:
+      - chatgpt-castulo-illustrated-study-20261029
+    paths:
+      - ".chatgpt-build/**"
+      - ".github/workflows/build-castulo-study.yml"
+      - "OneDrive/Documents/1-ARQUEOLOGÍA/2-INDUSTRIA-ÓSEA/1-Industria-ösea-de-Cástulo/Clasificación-Huesos-de-Castulo-(7-10-26)/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout just the classification folder and builder
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt-castulo-illustrated-study-20261029
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .chatgpt-build
+            OneDrive/Documents/1-ARQUEOLOGÍA/2-INDUSTRIA-ÓSEA/1-Industria-ösea-de-Cástulo/Clasificación-Huesos-de-Castulo-(7-10-26)
+          sparse-checkout-cone-mode: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF and document libraries
+        run: python -m pip install --disable-pip-version-check reportlab pillow python-docx
+      - name: Generate extended illustrated PDF
+        run: python .chatgpt-build/build_castulo_study.py
+      - name: Upload PDF for delivery
+        uses: actions/upload-artifact@v4
+        with:
+          name: castulo-illustrated-study-pdf
+          path: Estudio_extenso_industria_osea_Castulo_ilustrado.pdf
+          if-no-files-found: error
+          retention-days: 3
