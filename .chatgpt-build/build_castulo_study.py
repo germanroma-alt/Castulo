@@ -274,7 +274,9 @@ def main():
         by_hash = {}
         for p in sorted(originals, key=lambda z: str(z).lower()):
             fam = family_for_path(p)
-            if fam != "?":
+            if fam != "?" and code.isdigit():
+                # Quantitative family incidence is calculated only from numeric inventory codes;
+                # descriptive/supplementary image names are catalogued separately.
                 family_codes[fam].add(code)
             try:
                 jpg, digest = prepare_image(p)
